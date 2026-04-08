@@ -1,3 +1,3 @@
-package type_definition
+package no_constructor_basic
 
 type Address string // want `no-constructor`
