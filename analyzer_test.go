@@ -106,3 +106,7 @@ func TestUntypedLiteralVarAssign(t *testing.T) {
 func TestUntypedLiteralFuncArg(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "untyped_literal_func_arg")
 }
+
+func TestSamePackageConstantNotFlagged(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "same_package_constant_not_flagged")
+}
