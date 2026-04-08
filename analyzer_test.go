@@ -1,0 +1,20 @@
+package safegotypes_test
+
+import (
+	"path/filepath"
+	"runtime"
+	"testing"
+
+	"golang.org/x/tools/go/analysis/analysistest"
+
+	safegotypes "safe-go-types-lint"
+)
+
+func testdata() string {
+	_, filename, _, _ := runtime.Caller(0)
+	return filepath.Join(filepath.Dir(filename), "testdata")
+}
+
+func TestStructFieldRawString(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "struct_string_field")
+}
