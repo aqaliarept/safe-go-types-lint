@@ -94,3 +94,7 @@ func TestNoCastOutsideConstructor(t *testing.T) {
 func TestNoCastInsideConstructorNotFlagged(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_cast_inside_constructor_not_flagged")
 }
+
+func TestNoCastReverseConversionNotFlagged(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_cast_reverse_conversion_not_flagged")
+}
