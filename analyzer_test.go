@@ -38,3 +38,7 @@ func TestFuncParamNotFlagged(t *testing.T) {
 func TestFuncReturnNotFlagged(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "func_return")
 }
+
+func TestAllScalarTypesInStructFlagged(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "all_scalars")
+}
