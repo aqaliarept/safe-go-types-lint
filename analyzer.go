@@ -28,29 +28,26 @@ var scalars = map[string]bool{
 func run(pass *analysis.Pass) (interface{}, error) {
 	insp := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 
-	nodeFilter := []ast.Node{
-		(*ast.StructType)(nil),
-	}
-
-	insp.Preorder(nodeFilter, func(n ast.Node) {
-		st := n.(*ast.StructType)
-		for _, field := range st.Fields.List {
-			if ident, ok := field.Type.(*ast.Ident); ok {
-				if scalars[ident.Name] {
-					// Confirm the type resolves to a built-in (not a named type from the package)
-					if obj := pass.TypesInfo.Uses[ident]; obj != nil {
-						if _, isBuiltin := obj.(*types.TypeName); isBuiltin {
-							if obj.Pkg() == nil { // built-in types have no package
-								for _, name := range field.Names {
-									pass.Reportf(name.Pos(), "safe-go-types/no-scalar: field %q has raw scalar type %q", name.Name, ident.Name)
-								}
-							}
-						}
-					}
-				}
+	insp.Preorder([]ast.Node{(*ast.StructType)(nil)}, func(n ast.Node) {
+		for _, field := range n.(*ast.StructType).Fields.List {
+			ident, ok := field.Type.(*ast.Ident)
+			if !ok || !scalars[ident.Name] {
+				continue
+			}
+			if !isBuiltinType(pass.TypesInfo.Uses[ident]) {
+				continue
+			}
+			for _, name := range field.Names {
+				pass.Reportf(name.Pos(), "safe-go-types/no-scalar: field %q has raw scalar type %q", name.Name, ident.Name)
 			}
 		}
 	})
 
 	return nil, nil
+}
+
+// isBuiltinType reports whether obj is a built-in type (no package).
+func isBuiltinType(obj types.Object) bool {
+	_, ok := obj.(*types.TypeName)
+	return ok && obj.Pkg() == nil
 }
