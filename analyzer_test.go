@@ -22,3 +22,7 @@ func TestStructFieldRawString(t *testing.T) {
 func TestStructFieldRawInt(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "struct_int_field")
 }
+
+func TestStructFieldCustomTypeNotFlagged(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "struct_custom_type_field")
+}
