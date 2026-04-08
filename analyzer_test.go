@@ -18,3 +18,7 @@ func testdata() string {
 func TestStructFieldRawString(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "struct_string_field")
 }
+
+func TestStructFieldRawInt(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "struct_int_field")
+}
