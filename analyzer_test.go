@@ -122,3 +122,7 @@ func TestVarScalarExplicit(t *testing.T) {
 func TestVarScalarShortAssign(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "var_scalar_short_assign")
 }
+
+func TestVarScalarFuncCallNotFlagged(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "var_scalar_func_call")
+}
