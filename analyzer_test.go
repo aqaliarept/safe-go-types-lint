@@ -180,3 +180,9 @@ func TestExcludePathsMatchingFileProducesNoDiagnostics(t *testing.T) {
 	t.Cleanup(func() { _ = safegotypes.Analyzer.Flags.Set("exclude-paths", "") })
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "legacy")
 }
+
+func TestExcludePathsNonMatchingFileIsStillChecked(t *testing.T) {
+	_ = safegotypes.Analyzer.Flags.Set("exclude-paths", "legacy/**")
+	t.Cleanup(func() { _ = safegotypes.Analyzer.Flags.Set("exclude-paths", "") })
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "domain_check")
+}
