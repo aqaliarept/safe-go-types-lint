@@ -19,3 +19,14 @@
 | 2026-04-08 | Phase 2 | constructor in a different package is not recognized | ✅ | 8f02b00 |
 | 2026-04-08 | Phase 2 | custom type derived from another custom type requires its own constructor | ✅ | 468044e |
 | 2026-04-08 | Phase 2 | refactor no-constructor implementation | ✅ | 95d52a2 |
+| 2026-04-08 | Phase 3 | bare var declaration of custom type is flagged | ✅ | 92a4bce |
+| 2026-04-08 | Phase 3 | custom type obtained via constructor is not flagged | ✅ | 8b10d63 |
+| 2026-04-08 | Phase 3 | struct field of custom type with no initializer is flagged | ✅ | 3a20ddb |
+| 2026-04-08 | Phase 3 | explicit cast to custom type outside constructor is flagged | ✅ | 6a1b73d |
+| 2026-04-08 | Phase 3 | cast inside constructor body is not flagged | ✅ | 52a72c2 |
+| 2026-04-08 | Phase 3 | reverse conversion from custom type to scalar is not flagged | ✅ | 8c1b651 |
+| 2026-04-08 | Phase 3 | untyped string literal assigned to custom type variable is flagged | ✅ | 8ea1f2d |
+| 2026-04-08 | Phase 3 | untyped literal passed as custom type argument is flagged | ✅ | 3ece636 |
+| 2026-04-08 | Phase 3 | same-package constant is not flagged | ✅ | 6d32d71 |
+| 2026-04-08 | Phase 3 | constant from same package used as value is not flagged | ✅ | a464123 |
+| 2026-04-08 | Phase 3 | refactor phase 3 implementation | ✅ | ed4075b |
