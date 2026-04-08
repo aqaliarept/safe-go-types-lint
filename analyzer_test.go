@@ -9,7 +9,7 @@ import (
 
 	"golang.org/x/tools/go/analysis/analysistest"
 
-	safegotypes "safe-go-types-lint"
+	safegotypes "github.com/aqaliarept/safe-go-types-lint"
 )
 
 func testdata() string {

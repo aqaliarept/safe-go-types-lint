@@ -3,7 +3,7 @@ linters-settings:
     safe-go-types:
       path: bin/safe-go-types-lint
       description: Flags raw scalar types in struct fields and local variable declarations.
-      original-url: github.com/your-org/safe-go-types-lint
+      original-url: github.com/aqaliarept/safe-go-types-lint
 
 linters:
   enable:

@@ -1,4 +1,4 @@
-module safe-go-types-lint
+module github.com/aqaliarept/safe-go-types-lint
 
 go 1.25.0
 
