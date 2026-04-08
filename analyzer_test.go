@@ -142,3 +142,7 @@ func TestSliceCustomTypeNotFlagged(t *testing.T) {
 func TestMapScalarStructField(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "map_scalar_struct_field")
 }
+
+func TestMapScalarLocalVar(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "map_scalar_local_var")
+}

@@ -85,9 +85,6 @@ func checkNoScalarLocalVar(pass *analysis.Pass) {
 					}
 					// Flag only when RHS is a literal (not a function call or identifier).
 					for i, rhs := range node.Rhs {
-						if !isScalarLiteralExpr(rhs) {
-							continue
-						}
 						if i >= len(node.Lhs) {
 							break
 						}
@@ -95,15 +92,27 @@ func checkNoScalarLocalVar(pass *analysis.Pass) {
 						if !ok {
 							continue
 						}
-						obj := pass.TypesInfo.Defs[lhsIdent]
-						if obj == nil {
-							continue
+						switch rhsNode := rhs.(type) {
+						case *ast.BasicLit:
+							// e.g. result := "pending"
+							obj := pass.TypesInfo.Defs[lhsIdent]
+							if obj == nil {
+								continue
+							}
+							if scalarTypeName(obj.Type()) == "" {
+								continue
+							}
+							pass.Reportf(lhsIdent.Pos(), "safe-go-types/no-scalar: variable %q has raw scalar type", lhsIdent.Name)
+						case *ast.CompositeLit:
+							// e.g. counts := map[string]int{}
+							if rhsNode.Type == nil {
+								continue
+							}
+							if !containsScalar(pass, rhsNode.Type) {
+								continue
+							}
+							pass.Reportf(lhsIdent.Pos(), "safe-go-types/no-scalar: variable %q has raw scalar type", lhsIdent.Name)
 						}
-						typeName := scalarTypeName(obj.Type())
-						if typeName == "" {
-							continue
-						}
-						pass.Reportf(lhsIdent.Pos(), "safe-go-types/no-scalar: variable %q has raw scalar type %q", lhsIdent.Name, typeName)
 					}
 				}
 				return true
