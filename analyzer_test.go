@@ -46,3 +46,7 @@ func TestAllScalarTypesInStructFlagged(t *testing.T) {
 func TestNoConstructorBasic(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_constructor_basic")
 }
+
+func TestNoConstructorExported(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_constructor_exported")
+}
