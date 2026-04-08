@@ -208,3 +208,7 @@ func TestNolintSpecificCodeSuppressesOnlyThatDiagnostic(t *testing.T) {
 func TestBlanketNolintSuppressesAllSafeGoTypesDiagnostics(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "nolint_blanket")
 }
+
+func TestNolintForDifferentLinterDoesNotSuppressSafeGoTypes(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "nolint_other")
+}
