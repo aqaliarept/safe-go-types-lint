@@ -194,3 +194,9 @@ func TestMultipleGlobPatternsAreAllApplied(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "generated2")
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "domain2")
 }
+
+func TestWildcardGlobMatchesNestedPaths(t *testing.T) {
+	_ = safegotypes.Analyzer.Flags.Set("exclude-paths", "**/vendored/**")
+	t.Cleanup(func() { _ = safegotypes.Analyzer.Flags.Set("exclude-paths", "") })
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "vendored")
+}
