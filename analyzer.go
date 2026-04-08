@@ -46,6 +46,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	})
 
 	checkNoConstructor(pass)
+	checkNoZeroValue(pass)
 
 	return nil, nil
 }
@@ -163,4 +164,73 @@ func isValidConstructorSignature(pass *analysis.Pass, fn *ast.FuncDecl, typeName
 func isBuiltinType(obj types.Object) bool {
 	_, ok := obj.(*types.TypeName)
 	return ok && obj.Pkg() == nil
+}
+
+// collectCustomTypes returns the set of custom type names in this package.
+// A custom type is: type T scalar, or type T U where U is also a custom type.
+func collectCustomTypes(pass *analysis.Pass) map[string]bool {
+	customTypes := map[string]bool{}
+
+	for _, file := range pass.Files {
+		for _, decl := range file.Decls {
+			genDecl, ok := decl.(*ast.GenDecl)
+			if !ok || genDecl.Tok != token.TYPE {
+				continue
+			}
+			for _, spec := range genDecl.Specs {
+				ts, ok := spec.(*ast.TypeSpec)
+				if !ok {
+					continue
+				}
+				ident, ok := ts.Type.(*ast.Ident)
+				if !ok {
+					continue
+				}
+				obj := pass.TypesInfo.Uses[ident]
+				if scalars[ident.Name] && isBuiltinType(obj) {
+					customTypes[ts.Name.Name] = true
+					continue
+				}
+				if obj != nil && obj.Pkg() != nil && obj.Pkg() == pass.Pkg {
+					customTypes[ts.Name.Name] = true
+				}
+			}
+		}
+	}
+	return customTypes
+}
+
+// checkNoZeroValue flags var declarations of custom types with no initializer.
+func checkNoZeroValue(pass *analysis.Pass) {
+	customTypes := collectCustomTypes(pass)
+
+	for _, file := range pass.Files {
+		for _, decl := range file.Decls {
+			genDecl, ok := decl.(*ast.GenDecl)
+			if !ok || genDecl.Tok != token.VAR {
+				continue
+			}
+			for _, spec := range genDecl.Specs {
+				vs, ok := spec.(*ast.ValueSpec)
+				if !ok {
+					continue
+				}
+				// Only flag when there's no initializer at all.
+				if len(vs.Values) > 0 {
+					continue
+				}
+				// Check if the declared type is a custom type.
+				if vs.Type == nil {
+					continue
+				}
+				ident, ok := vs.Type.(*ast.Ident)
+				if !ok || !customTypes[ident.Name] {
+					continue
+				}
+				for _, name := range vs.Names {
+					pass.Reportf(name.Pos(), "safe-go-types/no-zero-value: variable %q is zero-initialized custom type", name.Name)
+				}
+			}
+		}
+	}
 }

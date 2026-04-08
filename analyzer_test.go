@@ -74,3 +74,7 @@ func TestNoConstructorDifferentPackage(t *testing.T) {
 func TestNoConstructorDerived(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_constructor_derived")
 }
+
+func TestNoZeroValueBareVar(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_zero_value_bare_var")
+}
