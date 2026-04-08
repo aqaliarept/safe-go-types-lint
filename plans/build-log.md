@@ -17,3 +17,4 @@
 | 2026-04-08 | Phase 2 | constructor with extra return values is not recognized | ✅ | 34964ba |
 | 2026-04-08 | Phase 2 | constructor with wrong name prefix is not recognized | ✅ | ba31245 |
 | 2026-04-08 | Phase 2 | constructor in a different package is not recognized | ✅ | 8f02b00 |
+| 2026-04-08 | Phase 2 | custom type derived from another custom type requires its own constructor | ✅ | 468044e |
