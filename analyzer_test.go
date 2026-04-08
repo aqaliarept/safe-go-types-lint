@@ -118,3 +118,7 @@ func TestSamePackageConstantUsedNotFlagged(t *testing.T) {
 func TestVarScalarExplicit(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "var_scalar_explicit")
 }
+
+func TestVarScalarShortAssign(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "var_scalar_short_assign")
+}

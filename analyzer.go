@@ -66,24 +66,52 @@ func checkNoScalarLocalVar(pass *analysis.Pass) {
 			}
 			// Walk inside function bodies only.
 			ast.Inspect(fn.Body, func(inner ast.Node) bool {
-				decl, ok := inner.(*ast.GenDecl)
-				if !ok || decl.Tok != token.VAR {
-					return true
-				}
-				for _, spec := range decl.Specs {
-					vs, ok := spec.(*ast.ValueSpec)
-					if !ok || vs.Type == nil {
-						continue
+				switch node := inner.(type) {
+				case *ast.GenDecl:
+					if node.Tok != token.VAR {
+						return true
 					}
-					ident, ok := vs.Type.(*ast.Ident)
-					if !ok || !scalars[ident.Name] {
-						continue
+					for _, spec := range node.Specs {
+						vs, ok := spec.(*ast.ValueSpec)
+						if !ok || vs.Type == nil {
+							continue
+						}
+						ident, ok := vs.Type.(*ast.Ident)
+						if !ok || !scalars[ident.Name] {
+							continue
+						}
+						if !isBuiltinType(pass.TypesInfo.Uses[ident]) {
+							continue
+						}
+						for _, name := range vs.Names {
+							pass.Reportf(name.Pos(), "safe-go-types/no-scalar: variable %q has raw scalar type %q", name.Name, ident.Name)
+						}
 					}
-					if !isBuiltinType(pass.TypesInfo.Uses[ident]) {
-						continue
+				case *ast.AssignStmt:
+					if node.Tok != token.DEFINE {
+						return true
 					}
-					for _, name := range vs.Names {
-						pass.Reportf(name.Pos(), "safe-go-types/no-scalar: variable %q has raw scalar type %q", name.Name, ident.Name)
+					// Flag only when RHS is a literal (not a function call or identifier).
+					for i, rhs := range node.Rhs {
+						if !isScalarLiteralExpr(rhs) {
+							continue
+						}
+						if i >= len(node.Lhs) {
+							break
+						}
+						lhsIdent, ok := node.Lhs[i].(*ast.Ident)
+						if !ok {
+							continue
+						}
+						obj := pass.TypesInfo.Defs[lhsIdent]
+						if obj == nil {
+							continue
+						}
+						typeName := scalarTypeName(obj.Type())
+						if typeName == "" {
+							continue
+						}
+						pass.Reportf(lhsIdent.Pos(), "safe-go-types/no-scalar: variable %q has raw scalar type %q", lhsIdent.Name, typeName)
 					}
 				}
 				return true
@@ -200,6 +228,32 @@ func isValidConstructorSignature(pass *analysis.Pass, fn *ast.FuncDecl, typeName
 	}
 	errObj := pass.TypesInfo.Uses[secondIdent]
 	return errObj != nil && errObj.Pkg() == nil
+}
+
+// isScalarLiteralExpr reports whether expr is a scalar literal (BasicLit),
+// composite literal, or explicit type conversion — not a function call or identifier.
+func isScalarLiteralExpr(expr ast.Expr) bool {
+	switch expr.(type) {
+	case *ast.BasicLit:
+		return true
+	case *ast.CompositeLit:
+		return true
+	}
+	return false
+}
+
+// scalarTypeName returns the scalar type name for a types.Type if it is a builtin scalar,
+// otherwise returns "".
+func scalarTypeName(t types.Type) string {
+	basic, ok := t.(*types.Basic)
+	if !ok {
+		return ""
+	}
+	name := basic.Name()
+	if scalars[name] {
+		return name
+	}
+	return ""
 }
 
 // isBuiltinType reports whether obj is a built-in type (no package).
