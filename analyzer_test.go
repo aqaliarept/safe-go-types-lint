@@ -204,3 +204,7 @@ func TestWildcardGlobMatchesNestedPaths(t *testing.T) {
 func TestNolintSpecificCodeSuppressesOnlyThatDiagnostic(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "nolint_specific")
 }
+
+func TestBlanketNolintSuppressesAllSafeGoTypesDiagnostics(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "nolint_blanket")
+}
