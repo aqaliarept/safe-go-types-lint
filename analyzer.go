@@ -45,7 +45,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				continue
 			}
 			for _, name := range field.Names {
-				if isExcluded(pass, name.Pos()) {
+				if isExcluded(pass, name.Pos()) || isNolinted(pass, name.Pos(), "no-scalar") {
 					continue
 				}
 				pass.Reportf(name.Pos(), "safe-go-types/no-scalar: field %q has raw scalar type", name.Name)
@@ -62,6 +62,58 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	checkUntypedLiteral(pass, customTypes)
 
 	return nil, nil
+}
+
+// isNolinted reports whether pos is on a line with a //nolint comment that suppresses diagCode.
+// Suppression happens for:
+//   - //nolint:safe-go-types        (suppress all safe-go-types diagnostics)
+//   - //nolint:safe-go-types/<code> (suppress only that specific code)
+func isNolinted(pass *analysis.Pass, pos token.Pos, diagCode string) bool {
+	file := pass.Fset.File(pos)
+	posLine := file.Line(pos)
+
+	// Find the AST file to access its comments.
+	var astFile *ast.File
+	for _, f := range pass.Files {
+		if pass.Fset.File(f.Pos()).Name() == file.Name() {
+			astFile = f
+			break
+		}
+	}
+	if astFile == nil {
+		return false
+	}
+
+	for _, cg := range astFile.Comments {
+		for _, c := range cg.List {
+			if file.Line(c.Pos()) != posLine {
+				continue
+			}
+			text := c.Text
+			// Strip // prefix and trim.
+			if !strings.HasPrefix(text, "//") {
+				continue
+			}
+			inner := strings.TrimSpace(text[2:])
+			if !strings.HasPrefix(inner, "nolint:") {
+				continue
+			}
+			directives := strings.TrimPrefix(inner, "nolint:")
+			// There may be multiple linters: nolint:linter1,linter2
+			// Also may be followed by a space comment: nolint:linter1 // reason
+			directivePart := strings.Fields(directives)[0]
+			for _, d := range strings.Split(directivePart, ",") {
+				d = strings.TrimSpace(d)
+				if d == "safe-go-types" {
+					return true
+				}
+				if d == "safe-go-types/"+diagCode {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 // isExcluded reports whether the file containing pos matches any exclude-paths pattern.

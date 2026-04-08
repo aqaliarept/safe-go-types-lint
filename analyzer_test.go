@@ -200,3 +200,7 @@ func TestWildcardGlobMatchesNestedPaths(t *testing.T) {
 	t.Cleanup(func() { _ = safegotypes.Analyzer.Flags.Set("exclude-paths", "") })
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "vendored")
 }
+
+func TestNolintSpecificCodeSuppressesOnlyThatDiagnostic(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "nolint_specific")
+}
