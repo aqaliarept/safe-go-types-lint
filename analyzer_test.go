@@ -30,3 +30,7 @@ func TestStructFieldCustomTypeNotFlagged(t *testing.T) {
 func TestTypeDefinitionNotFlagged(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "type_definition")
 }
+
+func TestFuncParamNotFlagged(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "func_param")
+}
