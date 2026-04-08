@@ -166,3 +166,7 @@ func TestChanScalarLocalVar(t *testing.T) {
 func TestChanVarDeclNotDoubleReported(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "chan_var_decl_no_double")
 }
+
+func TestNestedCompositeScalar(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "nested_composite_scalar")
+}
