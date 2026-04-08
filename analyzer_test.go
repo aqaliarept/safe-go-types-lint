@@ -146,3 +146,7 @@ func TestMapScalarStructField(t *testing.T) {
 func TestMapScalarLocalVar(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "map_scalar_local_var")
 }
+
+func TestPtrScalarStructField(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "ptr_scalar_struct_field")
+}
