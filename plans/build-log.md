@@ -30,3 +30,17 @@
 | 2026-04-08 | Phase 3 | same-package constant is not flagged | ✅ | 6d32d71 |
 | 2026-04-08 | Phase 3 | constant from same package used as value is not flagged | ✅ | a464123 |
 | 2026-04-08 | Phase 3 | refactor phase 3 implementation | ✅ | ed4075b |
+| 2026-04-08 | Phase 4 | explicit scalar var declaration in function body is flagged | ✅ | 5bda537 |
+| 2026-04-08 | Phase 4 | short assignment with scalar literal is flagged | ✅ | 02da8d4 |
+| 2026-04-08 | Phase 4 | inferred type from function call is not flagged | ✅ | a6810f1 |
+| 2026-04-08 | Phase 4 | slice of scalar as struct field is flagged | ✅ | a64dc61 |
+| 2026-04-08 | Phase 4 | slice of scalar as local variable is flagged | ✅ | b5154be |
+| 2026-04-08 | Phase 4 | slice of custom type is not flagged | ✅ | cd238c7 |
+| 2026-04-08 | Phase 4 | map with scalar key or value as struct field is flagged | ✅ | b2fcb1b |
+| 2026-04-08 | Phase 4 | map with scalar value as local variable is flagged | ✅ | fac100a |
+| 2026-04-08 | Phase 4 | pointer to scalar as struct field is flagged | ✅ | cf5c86d |
+| 2026-04-08 | Phase 4 | pointer to scalar as local variable is flagged | ✅ | 553b8d7 |
+| 2026-04-08 | Phase 4 | channel of scalar as struct field is flagged | ✅ | e6330bc |
+| 2026-04-08 | Phase 4 | channel of scalar as local variable is flagged | ✅ | cb0c295 |
+| 2026-04-08 | Phase 4 | nested composite with scalar is flagged | ✅ | 0211568 |
+| 2026-04-08 | Phase 4 | slice of custom type as local variable is not flagged | ✅ | 97ac811 |

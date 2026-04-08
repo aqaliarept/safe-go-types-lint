@@ -13,7 +13,7 @@ import (
 
 var Analyzer = &analysis.Analyzer{
 	Name:     "safe_go_types",
-	Doc:      "Flags raw scalar types used as struct fields.",
+	Doc:      "Flags raw scalar types used in struct fields and local variable declarations.",
 	Requires: []*analysis.Analyzer{inspect.Analyzer},
 	Run:      run,
 }
@@ -266,18 +266,6 @@ func containsScalar(pass *analysis.Pass, expr ast.Expr) bool {
 		return containsScalar(pass, e.X)
 	case *ast.ChanType:
 		return containsScalar(pass, e.Value)
-	}
-	return false
-}
-
-// isScalarLiteralExpr reports whether expr is a scalar literal (BasicLit),
-// composite literal, or explicit type conversion — not a function call or identifier.
-func isScalarLiteralExpr(expr ast.Expr) bool {
-	switch expr.(type) {
-	case *ast.BasicLit:
-		return true
-	case *ast.CompositeLit:
-		return true
 	}
 	return false
 }
