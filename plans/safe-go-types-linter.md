@@ -16,6 +16,7 @@
 ## Phase 1: Scaffold + struct field scalar check + test project skeleton
 
 **Covers**: project structure, binary wiring, first working diagnostic, test project foundation
+**Scenarios**: [features/phase1-scaffold-struct-scalar.feature](features/phase1-scaffold-struct-scalar.feature)
 
 ### What to build
 
@@ -36,6 +37,7 @@ Set up the Go module with dependencies (`golang.org/x/tools/go/analysis`), imple
 ## Phase 2: Constructor registry + `no-constructor`
 
 **Covers**: constructor detection, per-package type registry, `no-constructor` diagnostic
+**Scenarios**: [features/phase2-constructor-registry.feature](features/phase2-constructor-registry.feature)
 
 ### What to build
 
@@ -55,6 +57,7 @@ Implement a per-package pass that collects all custom type definitions and all f
 ## Phase 3: Cast, zero-value, and untyped literal checks
 
 **Covers**: `no-cast`, `no-zero-value`, `untyped-literal` diagnostics
+**Scenarios**: [features/phase3-cast-zero-value-literal.feature](features/phase3-cast-zero-value-literal.feature)
 
 ### What to build
 
@@ -82,6 +85,7 @@ Same-package constants (`const Empty = Address("")`) are exempt from all three. 
 ## Phase 4: Extend `no-scalar` to variable declarations and composite types
 
 **Covers**: scalar detection in local variables, slices, maps, pointers, channels
+**Scenarios**: [features/phase4-variables-composites.feature](features/phase4-variables-composites.feature)
 
 ### What to build
 
@@ -103,6 +107,7 @@ Extend `no-scalar` beyond struct fields to: explicit local variable declarations
 ## Phase 5: Config, exclusions, and golangci-lint integration
 
 **Covers**: config loading, glob exclusions, `//nolint` wiring, golangci-lint `custom` linter setup
+**Scenarios**: [features/phase5-config-integration.feature](features/phase5-config-integration.feature)
 
 ### What to build
 
