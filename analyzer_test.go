@@ -34,3 +34,7 @@ func TestTypeDefinitionNotFlagged(t *testing.T) {
 func TestFuncParamNotFlagged(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "func_param")
 }
+
+func TestFuncReturnNotFlagged(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "func_return")
+}
