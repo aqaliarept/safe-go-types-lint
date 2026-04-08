@@ -98,3 +98,7 @@ func TestNoCastInsideConstructorNotFlagged(t *testing.T) {
 func TestNoCastReverseConversionNotFlagged(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_cast_reverse_conversion_not_flagged")
 }
+
+func TestUntypedLiteralVarAssign(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "untyped_literal_var_assign")
+}

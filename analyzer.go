@@ -48,6 +48,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	checkNoConstructor(pass)
 	checkNoZeroValue(pass)
 	checkNoCast(pass)
+	checkUntypedLiteral(pass)
 
 	return nil, nil
 }
@@ -335,6 +336,53 @@ func checkNoZeroValue(pass *analysis.Pass) {
 				}
 				for _, name := range vs.Names {
 					pass.Reportf(name.Pos(), "safe-go-types/no-zero-value: variable %q is zero-initialized custom type", name.Name)
+				}
+			}
+		}
+	}
+}
+
+// isUntypedLiteral reports whether expr is an untyped constant literal in source.
+// It checks for basic literals (string, int, float, char) which are always untyped.
+func isUntypedLiteral(expr ast.Expr) bool {
+	_, ok := expr.(*ast.BasicLit)
+	return ok
+}
+
+// checkUntypedLiteral flags untyped constant literals assigned to or passed as custom types.
+func checkUntypedLiteral(pass *analysis.Pass) {
+	customTypes := collectCustomTypes(pass)
+
+	for _, file := range pass.Files {
+		for _, decl := range file.Decls {
+			genDecl, ok := decl.(*ast.GenDecl)
+			if !ok {
+				continue
+			}
+			// Skip const declarations (same-package constant exemption).
+			if genDecl.Tok == token.CONST {
+				continue
+			}
+			if genDecl.Tok != token.VAR {
+				continue
+			}
+			for _, spec := range genDecl.Specs {
+				vs, ok := spec.(*ast.ValueSpec)
+				if !ok {
+					continue
+				}
+				// Need explicit type annotation to know the target type.
+				if vs.Type == nil {
+					continue
+				}
+				typeIdent, ok := vs.Type.(*ast.Ident)
+				if !ok || !customTypes[typeIdent.Name] {
+					continue
+				}
+				for i, val := range vs.Values {
+					if isUntypedLiteral(val) {
+						pass.Reportf(vs.Names[i].Pos(), "safe-go-types/untyped-literal: untyped literal assigned to custom type %q", typeIdent.Name)
+					}
 				}
 			}
 		}
