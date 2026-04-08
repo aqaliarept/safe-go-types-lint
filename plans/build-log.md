@@ -11,3 +11,4 @@
 | 2026-04-08 | Phase 1 | all scalar types in struct fields are flagged | ✅ | 3464598 |
 | 2026-04-08 | Phase 1 | refactor + binary entrypoint | ✅ | 6f21097 |
 | 2026-04-08 | Phase 2 | custom type with no constructor is flagged | ✅ | 25b12ff |
+| 2026-04-08 | Phase 2 | custom type with valid exported constructor is not flagged | ✅ | 62db3cc |
