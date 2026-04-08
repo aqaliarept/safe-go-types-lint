@@ -54,3 +54,7 @@ func TestNoConstructorExported(t *testing.T) {
 func TestNoConstructorUnexported(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_constructor_unexported")
 }
+
+func TestNoConstructorMissingError(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_constructor_missing_error")
+}
