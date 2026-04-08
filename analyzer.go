@@ -45,6 +45,8 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		}
 	})
 
+	checkNoScalarLocalVar(pass)
+
 	customTypes := collectCustomTypes(pass)
 	checkNoConstructor(pass)
 	checkNoZeroValue(pass, customTypes)
@@ -52,6 +54,43 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	checkUntypedLiteral(pass, customTypes)
 
 	return nil, nil
+}
+
+// checkNoScalarLocalVar flags local variable declarations with explicit raw scalar types.
+func checkNoScalarLocalVar(pass *analysis.Pass) {
+	for _, file := range pass.Files {
+		ast.Inspect(file, func(n ast.Node) bool {
+			fn, ok := n.(*ast.FuncDecl)
+			if !ok {
+				return true
+			}
+			// Walk inside function bodies only.
+			ast.Inspect(fn.Body, func(inner ast.Node) bool {
+				decl, ok := inner.(*ast.GenDecl)
+				if !ok || decl.Tok != token.VAR {
+					return true
+				}
+				for _, spec := range decl.Specs {
+					vs, ok := spec.(*ast.ValueSpec)
+					if !ok || vs.Type == nil {
+						continue
+					}
+					ident, ok := vs.Type.(*ast.Ident)
+					if !ok || !scalars[ident.Name] {
+						continue
+					}
+					if !isBuiltinType(pass.TypesInfo.Uses[ident]) {
+						continue
+					}
+					for _, name := range vs.Names {
+						pass.Reportf(name.Pos(), "safe-go-types/no-scalar: variable %q has raw scalar type %q", name.Name, ident.Name)
+					}
+				}
+				return true
+			})
+			return false
+		})
+	}
 }
 
 // checkNoConstructor flags custom types defined over scalars (or other custom
