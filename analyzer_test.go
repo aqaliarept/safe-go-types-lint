@@ -102,3 +102,7 @@ func TestNoCastReverseConversionNotFlagged(t *testing.T) {
 func TestUntypedLiteralVarAssign(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "untyped_literal_var_assign")
 }
+
+func TestUntypedLiteralFuncArg(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "untyped_literal_func_arg")
+}

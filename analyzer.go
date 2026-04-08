@@ -387,4 +387,50 @@ func checkUntypedLiteral(pass *analysis.Pass) {
 			}
 		}
 	}
+
+	// Check function call arguments.
+	for _, file := range pass.Files {
+		ast.Inspect(file, func(n ast.Node) bool {
+			call, ok := n.(*ast.CallExpr)
+			if !ok {
+				return true
+			}
+			// Get the callee's type from TypesInfo.
+			calleeTV, ok := pass.TypesInfo.Types[call.Fun]
+			if !ok {
+				return true
+			}
+			// Skip type conversions (callee is a type, not a function).
+			if calleeTV.IsType() {
+				return true
+			}
+			sig, ok := calleeTV.Type.Underlying().(*types.Signature)
+			if !ok {
+				return true
+			}
+			params := sig.Params()
+			for i, arg := range call.Args {
+				if !isUntypedLiteral(arg) {
+					continue
+				}
+				if i >= params.Len() {
+					break
+				}
+				paramType := params.At(i).Type()
+				// Get the named type.
+				named, ok := paramType.(*types.Named)
+				if !ok {
+					continue
+				}
+				if named.Obj().Pkg() != pass.Pkg {
+					continue
+				}
+				if !customTypes[named.Obj().Name()] {
+					continue
+				}
+				pass.Reportf(arg.Pos(), "safe-go-types/untyped-literal: untyped literal passed as custom type %q", named.Obj().Name())
+			}
+			return true
+		})
+	}
 }
