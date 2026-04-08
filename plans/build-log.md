@@ -55,3 +55,4 @@
 | 2026-04-08 | Phase 5 | example .golangci.yml is present | ✅ | ba3f9ba |
 | 2026-04-08 | Phase 5 | refactor phase 5 implementation | ✅ | 05381ff |
 | 2026-04-08 | Spec | reorganize feature files + SPEC.md + rename tests | ✅ | af8b57f |
+| 2026-04-08 | CI | GitHub Actions workflow | ✅ | a376837 |
