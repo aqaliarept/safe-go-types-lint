@@ -112,6 +112,24 @@ func checkNoScalarLocalVar(pass *analysis.Pass) {
 								continue
 							}
 							pass.Reportf(lhsIdent.Pos(), "safe-go-types/no-scalar: variable %q has raw scalar type", lhsIdent.Name)
+						case *ast.CallExpr:
+							// e.g. ch := make(chan string)
+							// Flag when the first argument to make is a ChanType with scalar element.
+							callIdent, ok := rhsNode.Fun.(*ast.Ident)
+							if !ok || callIdent.Name != "make" {
+								continue
+							}
+							if len(rhsNode.Args) == 0 {
+								continue
+							}
+							chanType, ok := rhsNode.Args[0].(*ast.ChanType)
+							if !ok {
+								continue
+							}
+							if !containsScalar(pass, chanType.Value) {
+								continue
+							}
+							pass.Reportf(lhsIdent.Pos(), "safe-go-types/no-scalar: variable %q has raw scalar type", lhsIdent.Name)
 						}
 					}
 				}

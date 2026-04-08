@@ -158,3 +158,11 @@ func TestPtrScalarLocalVar(t *testing.T) {
 func TestChanScalarStructField(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "chan_scalar_struct_field")
 }
+
+func TestChanScalarLocalVar(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "chan_scalar_local_var")
+}
+
+func TestChanVarDeclNotDoubleReported(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "chan_var_decl_no_double")
+}
