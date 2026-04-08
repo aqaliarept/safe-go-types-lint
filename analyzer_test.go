@@ -1,8 +1,10 @@
 package safegotypes_test
 
 import (
+	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 
 	"golang.org/x/tools/go/analysis/analysistest"
@@ -211,4 +213,17 @@ func TestBlanketNolintSuppressesAllSafeGoTypesDiagnostics(t *testing.T) {
 
 func TestNolintForDifferentLinterDoesNotSuppressSafeGoTypes(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "nolint_other")
+}
+
+func TestGolangciLintYmlExists(t *testing.T) {
+	_, filename, _, _ := runtime.Caller(0)
+	root := filepath.Dir(filename)
+	yamlPath := filepath.Join(root, ".golangci.yml")
+	data, err := os.ReadFile(yamlPath)
+	if err != nil {
+		t.Fatalf(".golangci.yml not found: %v", err)
+	}
+	if !strings.Contains(string(data), "safe-go-types") {
+		t.Errorf(".golangci.yml does not mention safe-go-types")
+	}
 }
