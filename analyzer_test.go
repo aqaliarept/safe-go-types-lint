@@ -170,3 +170,7 @@ func TestChanVarDeclNotDoubleReported(t *testing.T) {
 func TestNestedCompositeScalar(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "nested_composite_scalar")
 }
+
+func TestSliceCustomTypeLocalVarNotFlagged(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "slice_custom_type_local_var")
+}
