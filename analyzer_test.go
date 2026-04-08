@@ -82,3 +82,7 @@ func TestNoZeroValueBareVar(t *testing.T) {
 func TestNoZeroValueConstructorNotFlagged(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_zero_value_constructor_not_flagged")
 }
+
+func TestNoZeroValueStructField(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_zero_value_struct_field")
+}

@@ -167,10 +167,12 @@ func isBuiltinType(obj types.Object) bool {
 }
 
 // collectCustomTypes returns the set of custom type names in this package.
-// A custom type is: type T scalar, or type T U where U is also a custom type.
+// A custom type is: type T scalar, type T U where U is also a custom type,
+// or a struct type that contains at least one field of a custom type.
 func collectCustomTypes(pass *analysis.Pass) map[string]bool {
 	customTypes := map[string]bool{}
 
+	// First pass: scalar-backed and custom-type-backed types.
 	for _, file := range pass.Files {
 		for _, decl := range file.Decls {
 			genDecl, ok := decl.(*ast.GenDecl)
@@ -197,6 +199,37 @@ func collectCustomTypes(pass *analysis.Pass) map[string]bool {
 			}
 		}
 	}
+
+	// Second pass: struct types that have at least one field of a custom type.
+	for _, file := range pass.Files {
+		for _, decl := range file.Decls {
+			genDecl, ok := decl.(*ast.GenDecl)
+			if !ok || genDecl.Tok != token.TYPE {
+				continue
+			}
+			for _, spec := range genDecl.Specs {
+				ts, ok := spec.(*ast.TypeSpec)
+				if !ok {
+					continue
+				}
+				st, ok := ts.Type.(*ast.StructType)
+				if !ok {
+					continue
+				}
+				for _, field := range st.Fields.List {
+					fieldIdent, ok := field.Type.(*ast.Ident)
+					if !ok {
+						continue
+					}
+					if customTypes[fieldIdent.Name] {
+						customTypes[ts.Name.Name] = true
+						break
+					}
+				}
+			}
+		}
+	}
+
 	return customTypes
 }
 
