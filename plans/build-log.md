@@ -14,3 +14,4 @@
 | 2026-04-08 | Phase 2 | custom type with valid exported constructor is not flagged | ✅ | 62db3cc |
 | 2026-04-08 | Phase 2 | custom type with valid unexported constructor is not flagged | ✅ | 347151b |
 | 2026-04-08 | Phase 2 | constructor missing error return is not recognized | ✅ | 545d47a |
+| 2026-04-08 | Phase 2 | constructor with extra return values is not recognized | ✅ | 34964ba |
