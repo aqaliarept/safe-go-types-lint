@@ -86,3 +86,7 @@ func TestNoZeroValueConstructorNotFlagged(t *testing.T) {
 func TestNoZeroValueStructField(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_zero_value_struct_field")
 }
+
+func TestNoCastOutsideConstructor(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_cast_outside_constructor")
+}

@@ -47,6 +47,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 	checkNoConstructor(pass)
 	checkNoZeroValue(pass)
+	checkNoCast(pass)
 
 	return nil, nil
 }
@@ -231,6 +232,78 @@ func collectCustomTypes(pass *analysis.Pass) map[string]bool {
 	}
 
 	return customTypes
+}
+
+// collectConstructors returns a set of constructor function names in this package.
+// Keys are like "NewAddress" or "newAddress" for valid constructors.
+func collectConstructors(pass *analysis.Pass) map[string]bool {
+	constructors := map[string]bool{}
+	for _, file := range pass.Files {
+		for _, decl := range file.Decls {
+			fn, ok := decl.(*ast.FuncDecl)
+			if !ok || fn.Recv != nil {
+				continue
+			}
+			name := fn.Name.Name
+			typeName := constructorTarget(name)
+			if typeName == "" {
+				continue
+			}
+			if isValidConstructorSignature(pass, fn, typeName) {
+				constructors[name] = true
+			}
+		}
+	}
+	return constructors
+}
+
+// checkNoCast flags explicit conversions to custom types outside their constructors.
+func checkNoCast(pass *analysis.Pass) {
+	customTypes := collectCustomTypes(pass)
+
+	for _, file := range pass.Files {
+		// Walk the AST tracking the current enclosing function.
+		var enclosingFunc string
+		ast.Inspect(file, func(n ast.Node) bool {
+			switch node := n.(type) {
+			case *ast.FuncDecl:
+				prev := enclosingFunc
+				enclosingFunc = node.Name.Name
+				// Walk the body explicitly.
+				ast.Inspect(node.Body, func(inner ast.Node) bool {
+					call, ok := inner.(*ast.CallExpr)
+					if !ok {
+						return true
+					}
+					ident, ok := call.Fun.(*ast.Ident)
+					if !ok {
+						return true
+					}
+					obj := pass.TypesInfo.Uses[ident]
+					if obj == nil {
+						return true
+					}
+					typeName, ok := obj.(*types.TypeName)
+					if !ok {
+						return true
+					}
+					if !customTypes[typeName.Name()] {
+						return true
+					}
+					// Check if enclosing func is named as a constructor for this type
+					// (New<T> or new<T>), regardless of signature validity.
+					if constructorTarget(enclosingFunc) == typeName.Name() {
+						return true
+					}
+					pass.Reportf(call.Pos(), "safe-go-types/no-cast: conversion to custom type %q outside its constructor", typeName.Name())
+					return true
+				})
+				enclosingFunc = prev
+				return false // already walked body above
+			}
+			return true
+		})
+	}
 }
 
 // checkNoZeroValue flags var declarations of custom types with no initializer.
