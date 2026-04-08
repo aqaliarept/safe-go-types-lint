@@ -186,3 +186,11 @@ func TestExcludePathsNonMatchingFileIsStillChecked(t *testing.T) {
 	t.Cleanup(func() { _ = safegotypes.Analyzer.Flags.Set("exclude-paths", "") })
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "domain_check")
 }
+
+func TestMultipleGlobPatternsAreAllApplied(t *testing.T) {
+	_ = safegotypes.Analyzer.Flags.Set("exclude-paths", "legacy2/**,generated2/**")
+	t.Cleanup(func() { _ = safegotypes.Analyzer.Flags.Set("exclude-paths", "") })
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "legacy2")
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "generated2")
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "domain2")
+}
