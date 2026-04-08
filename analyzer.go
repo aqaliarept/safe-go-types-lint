@@ -4,12 +4,21 @@ import (
 	"go/ast"
 	"go/token"
 	"go/types"
+	"path/filepath"
+	"strings"
 	"unicode"
 
+	"github.com/bmatcuk/doublestar/v4"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 	"golang.org/x/tools/go/ast/inspector"
 )
+
+var excludePaths string
+
+func init() {
+	Analyzer.Flags.StringVar(&excludePaths, "exclude-paths", "", "comma-separated glob patterns for paths to exclude")
+}
 
 var Analyzer = &analysis.Analyzer{
 	Name:     "safe_go_types",
@@ -36,6 +45,9 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				continue
 			}
 			for _, name := range field.Names {
+				if isExcluded(pass, name.Pos()) {
+					continue
+				}
 				pass.Reportf(name.Pos(), "safe-go-types/no-scalar: field %q has raw scalar type", name.Name)
 			}
 		}
@@ -50,6 +62,32 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	checkUntypedLiteral(pass, customTypes)
 
 	return nil, nil
+}
+
+// isExcluded reports whether the file containing pos matches any exclude-paths pattern.
+func isExcluded(pass *analysis.Pass, pos token.Pos) bool {
+	if excludePaths == "" {
+		return false
+	}
+	filePath := pass.Fset.File(pos).Name()
+	slashPath := filepath.ToSlash(filePath)
+	for _, pattern := range strings.Split(excludePaths, ",") {
+		pattern = strings.TrimSpace(pattern)
+		if pattern == "" {
+			continue
+		}
+		matched, _ := doublestar.Match(pattern, slashPath)
+		if matched {
+			return true
+		}
+		// Also try matching against just the last path components
+		// in case the pattern doesn't have a leading path prefix.
+		matched, _ = doublestar.Match("**/"+pattern, slashPath)
+		if matched {
+			return true
+		}
+	}
+	return false
 }
 
 // checkNoScalarLocalVar flags local variable declarations with explicit raw scalar types.

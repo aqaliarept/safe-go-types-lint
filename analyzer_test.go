@@ -174,3 +174,9 @@ func TestNestedCompositeScalar(t *testing.T) {
 func TestSliceCustomTypeLocalVarNotFlagged(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "slice_custom_type_local_var")
 }
+
+func TestExcludePathsMatchingFileProducesNoDiagnostics(t *testing.T) {
+	_ = safegotypes.Analyzer.Flags.Set("exclude-paths", "legacy/**")
+	t.Cleanup(func() { _ = safegotypes.Analyzer.Flags.Set("exclude-paths", "") })
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "legacy")
+}
