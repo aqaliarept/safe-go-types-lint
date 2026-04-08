@@ -32,15 +32,11 @@ func run(pass *analysis.Pass) (interface{}, error) {
 
 	insp.Preorder([]ast.Node{(*ast.StructType)(nil)}, func(n ast.Node) {
 		for _, field := range n.(*ast.StructType).Fields.List {
-			ident, ok := field.Type.(*ast.Ident)
-			if !ok || !scalars[ident.Name] {
-				continue
-			}
-			if !isBuiltinType(pass.TypesInfo.Uses[ident]) {
+			if !containsScalar(pass, field.Type) {
 				continue
 			}
 			for _, name := range field.Names {
-				pass.Reportf(name.Pos(), "safe-go-types/no-scalar: field %q has raw scalar type %q", name.Name, ident.Name)
+				pass.Reportf(name.Pos(), "safe-go-types/no-scalar: field %q has raw scalar type", name.Name)
 			}
 		}
 	})
@@ -76,15 +72,11 @@ func checkNoScalarLocalVar(pass *analysis.Pass) {
 						if !ok || vs.Type == nil {
 							continue
 						}
-						ident, ok := vs.Type.(*ast.Ident)
-						if !ok || !scalars[ident.Name] {
-							continue
-						}
-						if !isBuiltinType(pass.TypesInfo.Uses[ident]) {
+						if !containsScalar(pass, vs.Type) {
 							continue
 						}
 						for _, name := range vs.Names {
-							pass.Reportf(name.Pos(), "safe-go-types/no-scalar: variable %q has raw scalar type %q", name.Name, ident.Name)
+							pass.Reportf(name.Pos(), "safe-go-types/no-scalar: variable %q has raw scalar type", name.Name)
 						}
 					}
 				case *ast.AssignStmt:
@@ -228,6 +220,27 @@ func isValidConstructorSignature(pass *analysis.Pass, fn *ast.FuncDecl, typeName
 	}
 	errObj := pass.TypesInfo.Uses[secondIdent]
 	return errObj != nil && errObj.Pkg() == nil
+}
+
+// containsScalar reports whether the type expression expr contains a raw scalar
+// builtin type anywhere in its structure (e.g. []string, map[string]int, *bool, chan int).
+func containsScalar(pass *analysis.Pass, expr ast.Expr) bool {
+	switch e := expr.(type) {
+	case *ast.Ident:
+		if !scalars[e.Name] {
+			return false
+		}
+		return isBuiltinType(pass.TypesInfo.Uses[e])
+	case *ast.ArrayType:
+		return containsScalar(pass, e.Elt)
+	case *ast.MapType:
+		return containsScalar(pass, e.Key) || containsScalar(pass, e.Value)
+	case *ast.StarExpr:
+		return containsScalar(pass, e.X)
+	case *ast.ChanType:
+		return containsScalar(pass, e.Value)
+	}
+	return false
 }
 
 // isScalarLiteralExpr reports whether expr is a scalar literal (BasicLit),

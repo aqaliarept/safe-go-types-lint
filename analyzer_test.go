@@ -126,3 +126,7 @@ func TestVarScalarShortAssign(t *testing.T) {
 func TestVarScalarFuncCallNotFlagged(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "var_scalar_func_call")
 }
+
+func TestSliceScalarStructField(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "slice_scalar_struct_field")
+}
