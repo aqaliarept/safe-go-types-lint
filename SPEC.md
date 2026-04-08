@@ -30,7 +30,7 @@ All Go built-in scalar types:
 
 ### `no-scalar`
 
-**Scenarios**: [`plans/features/no-scalar.feature`](plans/features/no-scalar.feature)
+**Scenarios**: [`spec/features/no-scalar.feature`](spec/features/no-scalar.feature)
 
 **Flagged:**
 - Struct fields whose type is a raw scalar: `type User struct { Name string }`
@@ -50,7 +50,7 @@ All Go built-in scalar types:
 
 ### `no-constructor`
 
-**Scenarios**: [`plans/features/no-constructor.feature`](plans/features/no-constructor.feature)
+**Scenarios**: [`spec/features/no-constructor.feature`](spec/features/no-constructor.feature)
 
 **Flagged:**
 - Any custom type `type Foo <scalar>` that has no valid constructor in the same package
@@ -63,7 +63,7 @@ All Go built-in scalar types:
 
 ### `no-zero-value`
 
-**Scenarios**: [`plans/features/no-zero-value.feature`](plans/features/no-zero-value.feature)
+**Scenarios**: [`spec/features/no-zero-value.feature`](spec/features/no-zero-value.feature)
 
 **Flagged:**
 - Bare variable declarations of a custom type: `var a Address`
@@ -76,7 +76,7 @@ All Go built-in scalar types:
 
 ### `no-cast`
 
-**Scenarios**: [`plans/features/no-cast.feature`](plans/features/no-cast.feature)
+**Scenarios**: [`spec/features/no-cast.feature`](spec/features/no-cast.feature)
 
 **Flagged:**
 - Explicit conversion to a custom type outside its constructor body: `a := Address("foo")`
@@ -90,7 +90,7 @@ All Go built-in scalar types:
 
 ### `untyped-literal`
 
-**Scenarios**: [`plans/features/untyped-literal.feature`](plans/features/untyped-literal.feature)
+**Scenarios**: [`spec/features/untyped-literal.feature`](spec/features/untyped-literal.feature)
 
 **Flagged:**
 - Untyped literal assigned to a custom type variable: `var a Address = "foo"`
@@ -136,7 +136,7 @@ All messages are prefixed with the diagnostic code by the analysis framework: e.
 
 ## Configuration
 
-**Scenarios**: [`plans/features/configuration.feature`](plans/features/configuration.feature)
+**Scenarios**: [`spec/features/configuration.feature`](spec/features/configuration.feature)
 
 ### Excluding paths
 
