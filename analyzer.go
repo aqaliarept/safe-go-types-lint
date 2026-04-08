@@ -45,10 +45,11 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		}
 	})
 
+	customTypes := collectCustomTypes(pass)
 	checkNoConstructor(pass)
-	checkNoZeroValue(pass)
-	checkNoCast(pass)
-	checkUntypedLiteral(pass)
+	checkNoZeroValue(pass, customTypes)
+	checkNoCast(pass, customTypes)
+	checkUntypedLiteral(pass, customTypes)
 
 	return nil, nil
 }
@@ -235,32 +236,8 @@ func collectCustomTypes(pass *analysis.Pass) map[string]bool {
 	return customTypes
 }
 
-// collectConstructors returns a set of constructor function names in this package.
-// Keys are like "NewAddress" or "newAddress" for valid constructors.
-func collectConstructors(pass *analysis.Pass) map[string]bool {
-	constructors := map[string]bool{}
-	for _, file := range pass.Files {
-		for _, decl := range file.Decls {
-			fn, ok := decl.(*ast.FuncDecl)
-			if !ok || fn.Recv != nil {
-				continue
-			}
-			name := fn.Name.Name
-			typeName := constructorTarget(name)
-			if typeName == "" {
-				continue
-			}
-			if isValidConstructorSignature(pass, fn, typeName) {
-				constructors[name] = true
-			}
-		}
-	}
-	return constructors
-}
-
 // checkNoCast flags explicit conversions to custom types outside their constructors.
-func checkNoCast(pass *analysis.Pass) {
-	customTypes := collectCustomTypes(pass)
+func checkNoCast(pass *analysis.Pass, customTypes map[string]bool) {
 
 	for _, file := range pass.Files {
 		// Walk the AST tracking the current enclosing function.
@@ -308,9 +285,7 @@ func checkNoCast(pass *analysis.Pass) {
 }
 
 // checkNoZeroValue flags var declarations of custom types with no initializer.
-func checkNoZeroValue(pass *analysis.Pass) {
-	customTypes := collectCustomTypes(pass)
-
+func checkNoZeroValue(pass *analysis.Pass, customTypes map[string]bool) {
 	for _, file := range pass.Files {
 		for _, decl := range file.Decls {
 			genDecl, ok := decl.(*ast.GenDecl)
@@ -350,9 +325,7 @@ func isUntypedLiteral(expr ast.Expr) bool {
 }
 
 // checkUntypedLiteral flags untyped constant literals assigned to or passed as custom types.
-func checkUntypedLiteral(pass *analysis.Pass) {
-	customTypes := collectCustomTypes(pass)
-
+func checkUntypedLiteral(pass *analysis.Pass, customTypes map[string]bool) {
 	for _, file := range pass.Files {
 		for _, decl := range file.Decls {
 			genDecl, ok := decl.(*ast.GenDecl)
