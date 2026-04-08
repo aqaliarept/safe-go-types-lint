@@ -70,3 +70,7 @@ func TestNoConstructorWrongName(t *testing.T) {
 func TestNoConstructorDifferentPackage(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "domain")
 }
+
+func TestNoConstructorDerived(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_constructor_derived")
+}

@@ -16,3 +16,4 @@
 | 2026-04-08 | Phase 2 | constructor missing error return is not recognized | ✅ | 545d47a |
 | 2026-04-08 | Phase 2 | constructor with extra return values is not recognized | ✅ | 34964ba |
 | 2026-04-08 | Phase 2 | constructor with wrong name prefix is not recognized | ✅ | ba31245 |
+| 2026-04-08 | Phase 2 | constructor in a different package is not recognized | ✅ | 8f02b00 |
