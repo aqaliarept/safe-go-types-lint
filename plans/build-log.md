@@ -45,3 +45,11 @@
 | 2026-04-08 | Phase 4 | nested composite with scalar is flagged | ✅ | 0211568 |
 | 2026-04-08 | Phase 4 | slice of custom type as local variable is not flagged | ✅ | 97ac811 |
 | 2026-04-08 | Phase 4 | refactor phase 4 implementation | ✅ | d240d37 |
+| 2026-04-08 | Phase 5 | file matching exclude-paths glob produces no diagnostics | ✅ | ebcb1b7 |
+| 2026-04-08 | Phase 5 | file not matching any exclude-paths glob is still checked | ✅ | 4bca9bf |
+| 2026-04-08 | Phase 5 | multiple glob patterns are all applied | ✅ | 905b7da |
+| 2026-04-08 | Phase 5 | wildcard glob pattern matches nested paths | ✅ | 73c57cf |
+| 2026-04-08 | Phase 5 | nolint comment for specific code suppresses only that diagnostic | ✅ | 5a33a4f |
+| 2026-04-08 | Phase 5 | blanket nolint comment suppresses all safe-go-types diagnostics on that line | ✅ | a23fe07 |
+| 2026-04-08 | Phase 5 | nolint comment for a different linter does not suppress safe-go-types | ✅ | 7fbdbaa |
+| 2026-04-08 | Phase 5 | example .golangci.yml is present | ✅ | ba3f9ba |

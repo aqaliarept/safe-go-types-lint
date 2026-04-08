@@ -101,8 +101,11 @@ func isNolinted(pass *analysis.Pass, pos token.Pos, diagCode string) bool {
 			directives := strings.TrimPrefix(inner, "nolint:")
 			// There may be multiple linters: nolint:linter1,linter2
 			// Also may be followed by a space comment: nolint:linter1 // reason
-			directivePart := strings.Fields(directives)[0]
-			for _, d := range strings.Split(directivePart, ",") {
+			fields := strings.Fields(directives)
+			if len(fields) == 0 {
+				continue
+			}
+			for _, d := range strings.Split(fields[0], ",") {
 				d = strings.TrimSpace(d)
 				if d == "safe-go-types" {
 					return true
