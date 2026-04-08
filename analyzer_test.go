@@ -78,3 +78,7 @@ func TestNoConstructorDerived(t *testing.T) {
 func TestNoZeroValueBareVar(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_zero_value_bare_var")
 }
+
+func TestNoZeroValueConstructorNotFlagged(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_zero_value_constructor_not_flagged")
+}
