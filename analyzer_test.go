@@ -66,3 +66,7 @@ func TestNoConstructorExtraReturns(t *testing.T) {
 func TestNoConstructorWrongName(t *testing.T) {
 	analysistest.Run(t, testdata(), safegotypes.Analyzer, "no_constructor_wrong_name")
 }
+
+func TestNoConstructorDifferentPackage(t *testing.T) {
+	analysistest.Run(t, testdata(), safegotypes.Analyzer, "domain")
+}
