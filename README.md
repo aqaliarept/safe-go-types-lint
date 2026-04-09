@@ -64,30 +64,47 @@ safe-go-types-lint -exclude-paths="**/generated/**,**/vendor/**" ./...
 
 ## golangci-lint integration
 
-Add to your `.golangci.yml`:
+This linter integrates with golangci-lint v2 via the [module plugin system](https://golangci-lint.run/plugins/module-plugins/).
+
+**1.** Create `custom-gcl.yml` in your project root:
 
 ```yaml
-linters:
-  enable:
-    - safe-go-types
+version: v2.8.0
+name: custom-golangci-lint
+destination: ./bin/
 
-custom-linters:
-  safe-go-types:
-    path: bin/safe-go-types-lint
-    description: Enforce custom types over raw scalars
-    original-url: github.com/aqaliarept/safe-go-types-lint
-
-linters-settings:
-  safe-go-types:
-    exclude-paths:
-      - "**/generated/**"
-      - "**/vendor/**"
+plugins:
+  - module: github.com/aqaliarept/safe-go-types-lint
+    import: github.com/aqaliarept/safe-go-types-lint/plugin
+    version: latest
 ```
 
-Build the binary into `bin/` before running golangci-lint:
+**2.** Add to your `.golangci.yml`:
+
+```yaml
+version: "2"
+
+linters:
+  default: none
+  enable:
+    - safe-go-types
+  settings:
+    custom:
+      safe-go-types:
+        type: module
+        description: Enforce custom types over raw scalars
+        original-url: github.com/aqaliarept/safe-go-types-lint
+        settings:
+          exclude-paths:
+            - "**/generated/**"
+            - "**/vendor/**"
+```
+
+**3.** Build the custom golangci-lint binary and run it:
 
 ```sh
-go build -o bin/safe-go-types-lint github.com/aqaliarept/safe-go-types-lint/cmd/safe-go-types-lint
+golangci-lint custom
+./bin/custom-golangci-lint run ./...
 ```
 
 ## Configuration
@@ -100,7 +117,7 @@ Use `-exclude-paths` with comma-separated glob patterns. Files matching any patt
 safe-go-types-lint -exclude-paths="**/generated/**,internal/legacy/**" ./...
 ```
 
-In golangci-lint, use the `exclude-paths` setting under `linters-settings: safe-go-types:` (see above).
+In golangci-lint, use the `exclude-paths` setting under `linters.settings.custom.safe-go-types.settings:` (see above).
 
 ### Suppressing individual violations
 
